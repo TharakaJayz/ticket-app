@@ -4,10 +4,11 @@ import PriorityDisplay from './PriorityDisplay'
 import ProgessDisplay from './ProgessDisplay'
 import StatusDisplay from './StatusDisplay'
 import { TicketInterface } from './TicketForm';
+import Link from 'next/link'
 
 type Props = {
     id:number,
-    key:number,
+    keyTo:number,
     ticket:any
 }
 
@@ -30,15 +31,17 @@ const TicketCard = (props: Props) => {
 
     }
     return (
-        <div key={props.key} className=' flex flex-col bg-card hover:bg-card-hover rounded-md shadow-lg p-3 m-2'>
+        <div key={props.keyTo} className=' flex flex-col bg-card hover:bg-card-hover rounded-md shadow-lg p-3 m-2'>
             <div className='flex mb-3'>
 
                 <PriorityDisplay priority = {props.ticket.priority} />
                 <div className='ml-auto'>
 
-                    <DeleteBlock />
+                    <DeleteBlock  id={props.ticket._id}/>
                 </div>
             </div>
+            <Link href={`/TicketPage/${props.ticket._id}`} style={{display:"contents"}}>
+            
             <h4>{props.ticket.title}</h4>
             <hr className='h-px border-0 bg-page mb-2' />
             <p className='whitespace-pre-wrap'>
@@ -57,6 +60,7 @@ const TicketCard = (props: Props) => {
             < StatusDisplay status = {props.ticket.status} />
             </div>
             </div>
+            </Link>
         </div>
     )
 }

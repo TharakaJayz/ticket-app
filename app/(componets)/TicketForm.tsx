@@ -2,7 +2,9 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-type Props = {}
+type Props = {
+    ticket: any
+}
 
 export interface TicketInterface {
     title: string,
@@ -11,11 +13,12 @@ export interface TicketInterface {
     priority: number,
     progress: number,
     status: string,
-    active: Boolean
+    active: Boolean,
+
 }
 
 const TicketForm = (props: Props) => {
-
+    const EDITMODE = props.ticket._id === "new" ? false : true
     const router = useRouter();
 
     const handleChange = (e: any) => {
@@ -28,18 +31,30 @@ const TicketForm = (props: Props) => {
         }))
     }
 
-    const hanleSubmit = async(e:any) => {
+    const hanleSubmit = async (e: any) => {
         e.preventDefault()
+        if (EDITMODE) {
+            const res = await fetch(`/api/Tickets/${props.ticket._id}`, {
+                method: "PUT",
+                body: JSON.stringify({ formData })
+            })
 
-        const res =  await fetch("/api/Tickets",{
-            method:"POST",
-            body:JSON.stringify({formData})
-        })
+            if (!res.ok) {
+                throw new Error("Faild to create Ticket")
+            }
 
-        if(!res.ok){
-            throw new Error("Faild to create Ticket")
+        } else {
+
+            const res = await fetch("/api/Tickets", {
+                method: "POST",
+                body: JSON.stringify({ formData })
+            })
+
+            if (!res.ok) {
+                throw new Error("Faild to create Ticket")
+            }
         }
-        
+
         router.refresh();
         router.push("/");
     }
@@ -54,11 +69,22 @@ const TicketForm = (props: Props) => {
         active: false
     };
 
+    if (EDITMODE) {
+        startingTicketData["title"] = props.ticket.title
+        startingTicketData["description"] = props.ticket.description
+        startingTicketData["category"] = props.ticket.category
+        startingTicketData["priority"] = props.ticket.priority
+        startingTicketData["progress"] = props.ticket.progress
+        startingTicketData["status"] = props.ticket.status
+        startingTicketData["active"] = props.ticket.active
+    }
+
+
     const [formData, setFormData] = useState<TicketInterface>(startingTicketData);
     return (
         <div className='flex justify-center '>
             <form className='flex flex-col gap-3 w-1/2' method='post' onSubmit={hanleSubmit}>
-                <h3>Create Your Ticket</h3>
+                <h3> {EDITMODE ? "Update" : "Create"} Your Ticket</h3>
                 <label htmlFor="">Title</label>
                 <input id='title' name="title" type='text' onChange={handleChange} required={true} value={formData.title} />
                 <label htmlFor="">Description</label>
@@ -88,7 +114,7 @@ const TicketForm = (props: Props) => {
                 </div>
 
                 <label htmlFor="">Progress</label>
-                <input type="range" name='progress' value={formData.progress}  min={0}  max={100}onChange={handleChange}/>
+                <input type="range" name='progress' value={formData.progress} min={0} max={100} onChange={handleChange} />
 
                 <label htmlFor="">Status</label>
                 <select name="status" value={formData.category} onChange={handleChange}>
@@ -96,7 +122,7 @@ const TicketForm = (props: Props) => {
                     <option value="started ">Started</option>
                     <option value="done">Done</option>
                 </select>
-                <input type="submit"  className='btn '  value={"Create Ticket"}/>
+                <input type="submit" className='btn ' value={EDITMODE ? "Update  Ticket" : "Create  Ticket"} />
             </form>
         </div>
     )

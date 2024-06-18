@@ -36,7 +36,7 @@ export default async function Home() {
             <h2>{uniqueCategory}</h2>
             <div className="lg:grid grid-cols-2 xl:grid-cols-4">
               {allTickets.filter((ticket:any) => ticket.category === uniqueCategory).map((filterdTicket:any,indexTicket:any)=>(
-                <TicketCard id = {indexTicket} key={indexTicket} ticket = {filterdTicket}/>
+                <TicketCard id = {indexTicket} keyTo={indexTicket} ticket = {filterdTicket}/>
               ))}
             </div>
           </div>
